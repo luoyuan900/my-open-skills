@@ -1,0 +1,13 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Novel output (user-generated content)
+novel-generator/output/*.md
+!novel-generator/output/.gitkeep

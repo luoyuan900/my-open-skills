@@ -3,15 +3,15 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-compatible-blue)](https://agentskills.io)
 
-个人的 [Agent Skills](https://agentskills.io) 集合，用于 Claude Code 等 AI 编程助手。提供小说创作的全流程支持——从灵感构思到逐章量产，覆盖角色设计、世界观构建、爽文节奏、记忆防穿帮等。
+个人使用的 [Agent Skills](https://agentskills.io) 集合。
 
 ## 技能一览
 
 | 技能 | 定位 | 核心能力 |
 |------|------|---------|
-| [novel-generator](./novel-generator/) | 量产写手 | 爽文逐章生成、记忆防穿帮、节奏公式 |
-| [novel-writer-cn](./novel-writer-cn/) | 策划编辑 | 深度角色/世界观设计、多类型写作技巧 |
-| [novel-orchestrator](./novel-orchestrator/) | 编排调度 | 两者协同、长篇质量控制、降级决策 |
+| [novel-generator](./novel-generator/) | 量产写手（其他开源） | 爽文逐章生成、记忆防穿帮、节奏公式 |
+| [novel-writer-cn](./novel-writer-cn/) | 策划编辑（其他开源） | 深度角色/世界观设计、多类型写作技巧 |
+| [novel-orchestrator](./novel-orchestrator/) | 编排调度（自己写的） | 两者协同、长篇质量控制、降级决策 |
 
 ## 快速安装
 

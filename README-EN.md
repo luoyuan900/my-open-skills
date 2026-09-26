@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-compatible-blue)](https://agentskills.io)
 
-A personal collection of [Agent Skills](https://agentskills.io) for Claude Code and other AI coding assistants. Provides end-to-end support for novel writing — from ideation to chapter-by-chapter production, covering character design, worldbuilding, pacing formulas, and memory-based consistency.
+A personal collection of [Agent Skills](https://agentskills.io) for Claude Code and other AI coding assistants. Covers end-to-end novel writing — from ideation to chapter-by-chapter production — as well as AI video prompt engineering (MiniMax H3) and a local ComfyUI render-and-canvas workflow.
 
 ## Skills Overview
 
@@ -12,6 +12,8 @@ A personal collection of [Agent Skills](https://agentskills.io) for Claude Code 
 | [novel-generator](./novel-generator/) | Production Writer | Chapter-by-chapter web-novel generation, memory system for consistency, pacing formulas |
 | [novel-writer-cn](./novel-writer-cn/) | Planning Editor | Deep character/worldbuilding design, multi-genre writing techniques |
 | [novel-orchestrator](./novel-orchestrator/) | Orchestrator | Coordinated workflow, quality control for long-form, escalation decisions |
+| [h3-prompt-writing](./h3-prompt-writing/) | Video Prompt Engineer | MiniMax H3 multimodal video prompts: structured writing for T2VA/I2VA/FL2VA/L2VA/Ref2VA |
+| [local-miora-canvas](./local-miora-canvas/) | Local Render × Canvas | Local ComfyUI image/video generation + Miora canvas asset board and delivery |
 
 ## Quick Install
 
@@ -25,6 +27,8 @@ git clone https://github.com/luoyuan900/my-open-skills.git
 cp -r my-open-skills/novel-generator ~/.claude/skills/
 cp -r my-open-skills/novel-writer-cn ~/.claude/skills/
 cp -r my-open-skills/novel-orchestrator ~/.claude/skills/
+cp -r my-open-skills/h3-prompt-writing ~/.claude/skills/
+cp -r my-open-skills/local-miora-canvas ~/.claude/skills/
 ```
 
 Or install only the ones you need.
@@ -68,6 +72,34 @@ For novels over 20 chapters that need both literary depth and web-novel pacing.
 - Production phase: novel-generator for efficient writing
 - Polish phase: novel-writer-cn for quality refinement
 
+### 🎬 AI Video Prompts → h3-prompt-writing
+
+For multimodal video generation with MiniMax H3, when you need to rewrite a one-line brief into a structured English prompt.
+
+```
+"Rewrite this storyboard into an H3 Ref2VA six-section prompt"
+"Use I2VA mode to continue 15 seconds forward from this first frame"
+```
+
+- Covers all five modes: T2VA / I2VA / FL2VA / L2VA / full-reference Ref2VA
+- Base modes use `integrated_multimodal_description` / `overall_soundscape` / `non_diegetic_music`
+- Full-reference mode uses `subject_definitions` / `summary` / `retention_analysis` / `detailed_description` / `overall_soundscape` / `non_diegetic_music`
+- Pure local readable files, no external API dependency, portable to any Agent Skills-compatible agent
+
+### 🖼️ Local Render & Canvas → local-miora-canvas
+
+Local ComfyUI (127.0.0.1:8818) image/video generation, with a Miora canvas to centrally manage art assets and segmented clips.
+
+```
+"Generate this character set with krea2 and register them on the canvas"
+"Use the canvas character sheets as references to render segmented videos with the H3 r2v template"
+```
+
+- krea2 direct 1024 output, positive-only prompts, batch queueing to reduce reloads
+- MiniMax H3 with 8-step acceleration LoRA, 0.5MP, 17k+5 frame-length formula
+- Canvas is asset board + delivery panel only; cloud generation channels are forbidden
+- Hard VRAM limit: RTX 3060 12GB must not be exceeded
+
 ## Skill Selection Guide
 
 ```
@@ -97,8 +129,16 @@ my-open-skills/
 │   ├── SKILL.md               # Main workflow
 │   ├── assets/templates/      # Professional templates
 │   └── references/            # Writing guides
-└── novel-orchestrator/        # Orchestrator
-    └── SKILL.md               # Collaboration workflow
+├── novel-orchestrator/        # Orchestrator
+│   └── SKILL.md               # Collaboration workflow
+├── h3-prompt-writing/         # H3 video prompt engineer
+│   ├── SKILL.md               # Main workflow
+│   ├── agents/                # OpenAI/Codex UI metadata
+│   └── references/            # base-en / ref-en prompt structure guides
+└── local-miora-canvas/        # Local render × canvas asset management
+    ├── SKILL.md               # Main workflow
+    ├── references/            # Node-level workflow definitions
+    └── scripts/               # ComfyUI submit/monitor scripts
 ```
 
 ## Compatibility

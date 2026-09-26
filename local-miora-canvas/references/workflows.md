@@ -1,7 +1,8 @@
 # 工作流节点定义参考
 
-本文档记录两个本地 ComfyUI workflow 模板的节点级操作要点。模板文件在用户机器上：
-`C:/Users/luo/Downloads/comfyuiapi/`。加载本 skill 后按需读取本文档，避免每次重推节点 id。
+本文档记录两个本地 ComfyUI workflow 模板的节点级操作要点。模板文件位置由安装时配置
+（见 SKILL.md「环境配置」）：脚本按文件名在常见目录自动查找，也可在 `config.json`
+或对应环境变量中显式指定绝对路径。加载本 skill 后按需读取本文档，避免每次重推节点 id。
 
 ## 一、krea2 图像 workflow（Krea2_samll_then_large.json）
 

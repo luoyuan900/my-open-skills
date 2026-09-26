@@ -12,14 +12,40 @@ agent_created: true
 - **生成本体 = 本地 ComfyUI（127.0.0.1:8818）**：图片走 krea2，视频走 MiniMax H3。本 skill 为显式本地限定场景，不调用云端 ImageGen / VideoGen。
 - 画布不支持文字条目——所有标注放进条目 `title`，叙述性说明写在回复里。
 
-## 固定环境
+## 环境配置（首次安装必读）
+
+本 skill **不写死任何机器路径 / URL**。所有路径与地址在运行时按以下优先级解析
+（实现见 `scripts/comfy_submit.py`）：
+
+1. 环境变量（最高优先）
+2. 同目录 `config.json`（首次安装时由 agent 询问用户后写入，已加入 `.gitignore`，不提交）
+3. ComfyUI 服务地址自动探测本机端口 `8818` / `8188`
+4. 模板 / 输出目录按文件名在常见目录（Downloads / Documents / AI / ComfyUI）自动查找
+5. 仍找不到 → 脚本抛清晰错误，agent 询问用户并把绝对路径写进 `config.json`
+
+### 需要配置的项
+
+| 配置键 | 环境变量 | 含义 | 兜底 |
+|---|---|---|---|
+| `comfyui_url` | `COMFYUI_URL` | ComfyUI 服务地址 | 自动探测 8818 / 8188 |
+| `krea2_template` | `KREA2_TEMPLATE` | krea2 图像 workflow JSON 绝对路径 | 按文件名自动查找 |
+| `h3_r2v_template` | `H3_R2V_TEMPLATE` | H3 r2v 视频 workflow JSON 绝对路径 | 按文件名自动查找 |
+| `h3_fl2v_template` | `H3_FL2V_TEMPLATE` | H3 fl2v 视频 workflow JSON 绝对路径 | 按文件名自动查找 |
+| `output_dir` | `COMFYUI_OUTPUT` | ComfyUI 产出落盘目录（与 ComfyUI 同机的本地路径） | **必须显式配置** |
+
+### 首次安装流程（agent 执行）
+
+1. 探测 `http://127.0.0.1:8818` 与 `8188` 能否连通；命中即用，无需配置。
+2. 向用户询问四个本地路径：krea2 模板、H3 r2v 模板、H3 fl2v 模板、ComfyUI 输出目录。
+3. 把结果写入 `local-miora-canvas/config.json`（参考 `config.example.json`，不要提交进 git）。
+
+> 不想维护 `config.json` 也可以：直接给运行环境设环境变量，或把模板放进 Downloads
+> 等常见目录让其按文件名自动发现。`output_dir` 无法自动探测，务必显式给。
+
+## 固定约定（与机器无关）
 
 | 项 | 值 |
 |---|---|
-| ComfyUI API | `http://127.0.0.1:8818` |
-| krea2 图像模板 | `C:/Users/luo/Downloads/comfyuiapi/Krea2_samll_then_large.json` |
-| H3 r2v 视频模板 | `C:/Users/luo/Downloads/comfyuiapi/video_minimax_h3_r2v_turbo_8_step.json` |
-| 输出目录 | `C:/Users/luo/AI/Comfyui/ComfyUI/ComfyUI/output/video` |
 | 统一 seed | `20260816` |
 | 显存上限 | RTX 3060 12GB，不得击穿 |
 | 提交/监控脚本 | 本 skill `scripts/comfy_submit.py` |

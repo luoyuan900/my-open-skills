@@ -11,3 +11,6 @@ Thumbs.db
 # Novel output (user-generated content)
 novel-generator/output/*.md
 !novel-generator/output/.gitkeep
+
+# local-miora-canvas: per-install runtime config (contains machine-specific paths)
+local-miora-canvas/config.json

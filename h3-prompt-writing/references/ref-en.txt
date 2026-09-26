@@ -1,5 +1,11 @@
 # Full-Reference Mode Rewrite Output Format Guide
 
+> Engineering companion: for action-chain expansion, camera verbs, VFX/physical feedback,
+> lighting/materials, continuity rules, reusable templates, and a quality checklist, see
+> `references/enhanced-ref-en.txt` (MiniMax H3 Singularity enhanced guide). This file fixes
+> the exact six-section structure and label rules; the enhanced guide shows how to fill each
+> shot with concrete, physically readable detail.
+
 This guide explains how rewrite outputs are organized and written in full-reference mode.
 
 Write all six rewrite sections in English. Preserve the original language only for dialogue and lyrics inside `<d>` and for text visibly present in the scene.

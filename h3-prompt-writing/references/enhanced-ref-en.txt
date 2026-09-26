@@ -1,0 +1,365 @@
+# MiniMax H3 Singularity Video Prompt Writing Specification (Enhanced Guide)
+
+Full-Reference Image-to-Video · Enhanced Guide for Action, Camera, VFX, Lighting, Sound, and Continuity
+来源：ModelScope `zhouwenbin1994/Minimax-h3_Singularity_ref2va_Pruned_v1.3_int8`
+（本文档整合了 Full-Reference 提示词结构与官方训练语料中反复出现的高价值写法模式，是一份面向工程的撰写指南，而非对 MiniMax 内部未公开规则的声明。）
+
+> 字段结构（`subject_definitions` / `summary` / `retention_analysis` / `detailed_description` /
+> `overall_soundscape` / `non_diegetic_music` 的精确格式、标签规则、完整示例）见本 skill 的
+> `references/ref-en.txt`。本文件在其之上补充「如何把动作、镜头、特效、光影写具体」的工程方法。
+
+## 1. Core Design Principles
+
+一个强 H3 提示词应显式控制以下层次：
+
+- Reference — 每个参考图继承了哪些视觉信息。
+- Composition — 取景、景别、主体位置、前/背景关系。
+- Action — 连续、物理上可读的动作，而非孤立的动作标签。
+- Camera — 机位、运动类型、方向、速度、幅度，以及跟随对象。
+- Physics / VFX — 粒子、冲击、后坐、碎片、衣物/发丝响应、烟雾、光交互等后果。
+- Lighting / Materials — 光源、方向、曝光、反射、表面响应、氛围、纵深。
+- Audio — 环境声、同步音效、对白、音乐。
+- Continuity — 身份、空间方向、物体状态、损伤状态、时间推进。
+
+```text
+Shot ≈ 当前构图 + 主体状态 + 动作链 + 镜头运动 + 环境/物理反馈 + 光影变化 + 声音/对白
+Action chain ≈ 初始状态 → 触发 → 主动作 → 位移/动量 → 接触或反应 → 最终状态
+Camera chain ≈ 机位 → 运动方向 → 速度 → 幅度 → 跟随主体 → 焦点/景深结果
+```
+
+## 2. Standard Full-Reference Prompt Structure
+
+```text
+id="x..."
+subject_definitions:
+...
+summary:
+...
+retention_analysis:
+...
+detailed_description:
+...
+overall_soundscape:
+...
+non_diegetic_music:
+...
+```
+
+当工作流或应用期望该结构时，上面的字段名应保持稳定。
+
+## 3. subject_definitions
+
+用主体定义来建立**持久**的身份、外观、环境、道具等以参考为依据的元素。
+
+- 角色：稳定视觉身份——脸、发型、服装、身材特征、显著特征。
+- 环境：建筑、地形、主要物体、氛围、视觉风格。
+- 重要道具或 VFX 元素需要稳定视觉身份时单独定义。
+- 不要把长时段的时间轴动作放在这里；把演化中的动作放进 `detailed_description`。
+- 若参考图只定义了角色、场景、风格或外观，把它关联到对应 Subject，而非当成独立视频关键帧。
+
+## 4. Reference Images: Critical Distinction
+
+参考图不会自动成为视频角色或首帧。要区分「视觉继承」与「时间锚定」。
+
+- 用 `<Subject N>` 表示应出现在生成视频中的真实实体或场景内容。
+- 当图片真正充当首帧、关键帧、尾帧或构图锚点时，才用独立的 `<Picture N>`。
+- 若图片只提供外观、身份、服装、环境或风格，把该关系写进 Subject 定义内部。
+- 若参考只影响序列的某一段，要明确说明被参考的内容何时生效。
+
+## 5. summary
+
+概括主要视觉动作及其推进。好的 summary 描述「发生了什么、如何发展、最终状态」，而非仅仅剧情前提。
+
+## 6. retention_analysis
+
+当格式要求时，一致地使用保留关系：
+
+- `fully_preserved` — 被参考元素基本未变。
+- `partially_preserved` — 只保留了被选中的属性。
+- `attribute_transfer` — 被选中的视觉属性转移到了另一个生成元素。
+- `weak_reference` — 参考只提供松散的视觉引导。
+- `newly_generated` — 元素被创建，没有有意义的参考继承。
+- 音频：`fully_copy`、`partially_copy`、`reference`、`weak_reference`。
+
+## 7. detailed_description — The Core Field
+
+按播放顺序逐镜头组织。每个镜头回答七个实际问题：可见什么、主体在哪、初始状态、连续做什么、镜头怎么动、出现什么视觉/物理反馈、听到什么。
+
+```text
+[Shot 1] [景别 / 机位] establishes [主体位置 + 构图].
+[Subject] begins in [初始状态], then [触发/动作起始].
+As [主动作] continues, [身体运动 / 位移 / 道具运动].
+The camera [运动] at [速度/幅度], keeping [主体] in [构图关系].
+At the moment of [接触 / 冲击 / 情绪变化], [VFX / 物理响应 / 光影变化] occurs.
+The shot ends with [最终姿态 / 最终状态], while [声音/对白] continues or resolves.
+```
+
+后续镜头用明确时间戳，例如：
+
+```text
+[Shot 2] At 00:03.000, ...
+```
+
+推荐结构中 Shot 1 无时间戳；后续镜头在需要精确时间时加时间戳。
+
+## 8. Action Writing: From Labels to Processes
+
+当动作需要视觉可靠时，避免孤立动词（如 "walks"、"attacks"、"turns"、"explodes"），展开成因果序列。
+
+```text
+Preparation → Trigger → Acceleration → Primary action → Contact → Reaction → Recovery → Final state
+```
+
+**Weak:**
+
+```text
+The warrior attacks the enemy.
+```
+
+**Stronger:**
+
+```text
+The warrior lowers his center of gravity, shifts one foot forward, draws the sword back, then accelerates into a forward slash. The blade cuts across the frame with visible momentum; the opponent recoils from the impact, while loose fabric and dust react to the movement. The warrior completes the follow-through and settles into a guarded stance.
+```
+
+远景人物要显式保留连续运动：
+The two distant characters continue walking throughout the shot at a steady pace; their steps remain continuous even though their small scale makes the movement visually subtle.
+
+## 9. Camera / Cinematography
+
+避免 "dynamic camera"、"cinematic camera" 这类空话，要明确机位行为。
+
+- Tracking shot — 沿既定路径跟随运动主体。
+- Push-in — 镜头朝主体推进，增强视觉强调。
+- Pull-back — 镜头后退，露出空间或减弱强调。
+- Pan — 镜头水平旋转。
+- Tilt — 镜头垂直旋转。
+- Orbit / arc — 绕主体移动并保持空间关系。
+- Swoop — 镜头以明显曲线或俯冲轨迹穿越空间。
+- Whip-pan — 快速方向旋转，用于转场或突变。
+- Dive / plunge — 镜头从高机位急剧向下或向前。
+- Barrel roll — 镜头绕镜轴旋转同时穿越空间。
+- Handheld — 受控的小幅抖动，暗示临场感或不稳定。
+- Static / locked-off — 机位固定，动作在其内展开。
+
+一个稳健的镜头规格包含五要素：机位 / 景别 + 运动 + 方向 + 速度/幅度 + 跟随主体。
+把镜头绑定到动作上：例如侧面跟拍可在角色奔跑时保持其在画面中的侧脸，推进可在冲击瞬间加速。
+
+## 10. VFX and Physical Feedback
+
+不要只写 "add cool effects"，要描述触发、视觉形态、运动与环境后果。
+
+```text
+VFX ≈ 触发条件 + 形态 + 方向/运动 + 与环境的互动
+```
+
+- Energy / magic — 发射点、形状、方向、强度、飞行路径、命中。
+- Explosion — 起爆/命中点、扩张的火/烟、碎片轨迹、冲击波、环境响应。
+- Sparks — 来源、密度、方向、亮度、衰减。
+- Smoke / dust — 起源、扩张、漂移、湍流、与光的交互。
+- Fragments — 什么破裂、碎片方向、尺度、动量。
+- Liquid / blood — 冲击源、喷射方向、液滴、随后沉降。
+- Rifts / portals — 形成、边缘行为、内部运动、发射、消失。
+- Lightning — 起源、分叉、闪光时机、照明、接触效果。
+
+始终考虑物理反馈：头发与衣物受力反应、武器后坐、脚步扬起尘土、冰面在压力下开裂、附近表面被爆炸照亮、粒子从冲击继承动量。
+
+## 11. Lighting, Materials, and Visual Texture
+
+用具体视觉控制取代空泛的质量形容词。
+
+- 光源与方向。
+- 冷暖等指定光性（重要时）。
+- 曝光与对比变化。
+- 反射与湿表面响应。
+- 体积光、雾、烟或大气纵深。
+- 景深与焦点过渡。
+- 仅在快速运动合理时才用运动模糊。
+- 材质响应：皮肤、金属、织物、玻璃、水、冰、石等。
+
+"cinematic"、"epic"、"high quality"、"dynamic" 可以辅助描述，但绝不能替代可观察的视觉指令。
+
+## 12. Multi-Shot Timeline and Continuity
+
+按播放顺序写镜头，保持因果连续。
+
+- 除非刻意反转，保持一致的屏幕方向。
+- 跨镜头追踪武器位置、身体姿态、物体归属、道具状态。
+- 适当地把损伤、污迹、血、烟、破碎物体等持久状态向后传递。
+- 保持角色身份与服装一致。
+- 当图片用作关键帧时，保留其预期的参考锚定。
+- 把音效与可见冲击和动作同步。
+- 后续镜头在需要精确时间时用时间戳。
+
+## 13. Character Acting and Emotion
+
+把抽象情绪转成可观察的微动作。
+
+- Eyes：视线方向、眨眼、睁大、眯起、追踪。
+- Face：眉部运动、嘴唇紧张、下颌运动、微笑/皱眉变化。
+- Breathing：胸腔或肩膀运动、用力后的可见恢复。
+- Posture：肩膀、脊柱、头部角度、重心。
+- Hands：握力、手指运动、迟疑、松开。
+- Attention：明确说明角色在看什么或对什么作出反应。
+
+不要只写 "she looks nervous"，要描述行为：她的视线移向门口，嘴唇收紧，呼吸变浅，手指反复调整握姿。
+
+## 14. Dialogue, Soundscape, and Music
+
+跨镜头保持说话人身份稳定。
+
+```text
+(S1) speaks: "..."
+(S2) replies: "..."
+```
+
+- 使用稳定的说话人 ID，如 (S1)、(S2)。
+- 当格式要求时，把对白与可见口型同步。
+- 重要 diegetic 音效放进 `overall_soundscape`。
+- 用 `non_diegetic_music` 放背景配乐，不要与物理场景声混在一起。
+- 把脚步、冲击、武器碰撞、爆炸、风、水等音效与可见事件同步。
+
+## 15. Reusable High-Value Templates
+
+### 15.1 Distant Continuous Walking
+
+```text
+[Shot 1] A wide establishing shot shows <Subject 1> and <Subject 2> far in the background.
+Both subjects continue walking steadily along the path throughout the entire shot, maintaining consistent direction and spacing.
+The camera performs a slow lateral tracking movement, keeping the distant figures within the wide composition.
+Their clothing and hair move subtly with the surrounding breeze, while the environment remains visually dominant.
+```
+
+### 15.2 Wuxia / Xianxia Combat
+
+```text
+[Shot 1] A medium-wide side angle frames <Subject 1> and <Subject 2> in opposing positions.
+<Subject 1> shifts into a lower stance, draws the weapon backward, then launches forward with accelerating momentum.
+The camera tracks laterally with the attack, then arcs around the point of contact.
+At impact, sparks and dust burst outward, the opponent recoils, clothing and hair react to the force, and loose debris is displaced across the ground.
+The attacker completes the follow-through and settles into a controlled stance.
+```
+
+### 15.3 Explosion / Disaster
+
+```text
+[Shot 1] The camera begins in a stable wide shot as <Subject 1> stands near the center of the environment.
+A sudden trigger occurs behind the subject, followed by a rapidly expanding explosion.
+The camera pulls backward while panning to keep the subject and blast inside the frame.
+Fire, smoke, debris, dust, and fragments expand outward; nearby surfaces are illuminated by the flash and respond to the pressure wave.
+The shot ends as the initial blast subsides into drifting smoke and falling debris.
+```
+
+### 15.4 Magic / Energy Effect
+
+```text
+[Shot 1] <Subject 1> raises one hand and gathers a concentrated energy field around the palm.
+The energy intensifies from a small glow into a dense rotating mass, with particles spiraling inward before being released forward.
+The camera pushes toward the hand, then tracks the energy projectile as it travels through the environment.
+At impact, a shockwave expands outward, nearby dust and loose objects are displaced, and the surrounding surfaces receive a brief burst of colored illumination.
+```
+
+## 16. Common Failure Modes
+
+- 只用 cinematic、dynamic、epic、high-definition 这类泛化形容词。
+- 把每张参考图都当成自动首帧。
+- 用单词动作代替连续动作链。
+- 写 "dynamic camera" 却没给运动类型、方向、速度或主体关系。
+- 写 "cool VFX" 却没给触发、形态、运动或物理后果。
+- 给每个运动都加重度运动模糊。
+- 一个镜头塞太多同时进行的动作。
+- 跨镜头不一致地重定义同一 Subject。
+- 声音与可见事件不同步。
+- 抽象描述情绪而没有可观察的表演。
+- 远景/背景人物本应持续行走却没写明连续行走。
+
+## 17. Final Quality Checklist
+
+- 每张重要参考图是否都明确了用途？
+- Subject 身份是否稳定？
+- 每个主要动作是否都有起、进、反、终状态？
+- 镜头运动是否具体且绑定动作？
+- VFX 是否绑定物理触发与后果？
+- 光影与材质变化是否可观察而非空泛？
+- 声音是否与可见事件同步？
+- 说话人 ID 是否稳定？
+- 跨镜头连续性是否保持？
+- 远景/背景动作必须持续时是否显式写出？
+- 不必要的泛化形容词是否被具体视觉信息替换？
+
+## 18. Copyable Master Template
+
+```text
+id="x..."
+
+subject_definitions:
+<Subject 1>: [identity / appearance / clothing / distinctive features / reference relationship]
+<Subject 2>: [identity / appearance / clothing / distinctive features / reference relationship]
+<Environment>: [location / architecture / terrain / atmosphere / lighting]
+<Prop or VFX>: [appearance / material / persistent characteristics]
+
+summary:
+[Main action progression and final state]
+
+retention_analysis:
+[Reference → Subject relationships and preservation level]
+
+detailed_description:
+[Shot 1] [shot size / camera position] establishes [composition].
+[Subject] begins in [initial state], then [trigger].
+As [primary action] continues, [body / prop / environmental movement].
+The camera [movement] toward / along / around [direction], at [speed / amplitude], following [subject].
+At [impact / contact / emotional beat], [VFX / physics / lighting response].
+The shot ends with [final state].
+
+[Shot 2] At 00:03.000, [new composition and continuing state].
+[Action progression + camera + physical response + sound].
+[Continue as needed.]
+
+overall_soundscape:
+[Ambient environment + synchronized diegetic effects + dialogue]
+
+non_diegetic_music:
+[Music style / intensity / progression, if applicable]
+```
+
+## 19. Single-Shot High-Quality Example
+
+```text
+[Shot 1] A low-angle medium-wide tracking shot frames the warrior in the foreground, with the opponent several meters ahead on the same axis.
+The warrior begins in a compressed defensive stance, shoulders lowered and sword held close to the body. He shifts his rear foot forward, rotates his hips, draws the blade backward, and suddenly accelerates into a forward charge.
+The camera tracks backward at matching speed, maintaining the warrior in the lower-center of the frame while preserving the opponent in the background.
+As the warrior closes the distance, the blade swings upward and transitions into a diagonal slash. At the instant of contact, bright sparks burst from the collision point, dust lifts from the ground, and both characters' clothing and hair react to the force.
+The opponent is pushed backward several steps, briefly loses balance, then regains footing. The warrior completes the follow-through and lowers the blade into a guarded stance.
+The camera performs a small arc around the contact point and settles into a wider composition as the dust begins to disperse.
+Footsteps, cloth movement, the metallic impact, and drifting environmental ambience remain synchronized with the visible action.
+```
+
+此例刻意具体：给出起始状态、动作推进、镜头行为、物理响应、最终状态与同步声音，而非依赖泛化质量形容词。
+
+## 20. Training-Corpus-Derived High-Value Patterns
+
+以下模式特别有用，因为它们在提供的训练材料中反复提升动作可读性与视觉具体度：
+
+- 用明确的镜头动词：track、push in、pull back、pan、tilt、orbit、arc、swoop、dive、whip-pan、barrel roll。
+- 用暗示可见机制的行动动词：shift weight、brace、draw back、accelerate、lunge、swing through、recoil、stagger、recover、settle。
+- 描述环境响应：dust、sparks、fragments、smoke、cloth、hair、reflections、debris、pressure waves。
+- 连接因果：trigger → movement → impact → reaction。
+- 用时态过渡词：initially、then、as the action continues、at the moment of impact、afterward、finally。
+- 让镜头与动作同步，而非把它们写成互不相关的清单。
+- 用具体光影与材质行为，而非泛化质量断言。
+
+这些是语料衍生的写法模式，应视为实用的提示词工程指导，而非未公开的官方 MiniMax 实现规则。
+
+## 21. Recommended Prompt-Building Workflow
+
+1. 先定义参考关系：继承什么、新生成什么。
+2. 锁定持久的 Subject 与 Environment 描述。
+3. 写每个镜头的构图与起始状态。
+4. 把主动作展开成连续因果链。
+5. 加入物理跟随或强调动作的镜头运动。
+6. 在确切触发点加入 VFX 与环境反应。
+7. 加入由事件导致的光影/材质变化。
+8. 加入同步声音与对白。
+9. 检查时间线连续性。
+10. 删除空泛填充词，替换为可观察细节。

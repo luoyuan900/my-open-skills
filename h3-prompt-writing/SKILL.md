@@ -28,6 +28,8 @@ Ref2VA rewrites use `subject_definitions`, `summary`, `retention_analysis`, `det
 
 Read `references/ref-en.txt` for label rules, retention analysis, and complete examples.
 
+For advanced engineering patterns — action chains (labels → causal processes), camera verbs, VFX/physical feedback, lighting/materials, continuity, reusable templates, a pre-submit quality checklist, and training-corpus-derived patterns — read `references/enhanced-ref-en.txt` (MiniMax H3 Singularity enhanced guide). Use it together with `ref-en.txt`: the latter fixes the six-section structure and labels; the former tells you how to make each shot concrete and physically readable.
+
 ## Output Rules
 
 - Write rewrite sections in English; preserve dialogue, lyrics, and visible scene text in their original language.
